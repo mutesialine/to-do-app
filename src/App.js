@@ -1,20 +1,19 @@
-import { type } from "@testing-library/user-event/dist/type";
+
 import { useState } from "react";
 import { AiFillDelete, AiFillPlusCircle } from "react-icons/ai";
 const App = () => {
   const [task, setTask] = useState({
     taskName: "",
-    isTaskDone: true,
+    isTaskDone: false
   });
   const [buttonClicked, setButtonClicked]=useState(false)
    
 
 
 const handleTask = (event) =>{
-setTask( prevTask => ({...prevTask , [event.target.name] : event.target.value}))
+  const{name ,value,type, checked} =event.target
+setTask( prevTask => ({...prevTask , [name] : type==="checkbox" ? checked : value}))
 }
-
-
   return (
     <div className="w-full max-w-7xl mx-auto mt-24 flex flex-col gap-y-8 justify-center items-center">
       <h1 className="text-8xl font-bold text-gray-400 opacity-20">todos</h1>
@@ -36,9 +35,9 @@ setTask( prevTask => ({...prevTask , [event.target.name] : event.target.value}))
 
       <div className="flex justify-between items-center w-[50%] border-b-2 border-gray-300 pb-2">
         <div className="flex gap-x-3 items-center">
-          <input type="checkbox" checked={task.isTaskDone} name="isTaskDone" id="isTaskDone" />
+          <input type="checkbox" checked={task.isTaskDone} name="isTaskDone" id="isTaskDone" onChange={handleTask} />
           {buttonClicked &&
-            <label className="text-2xl font-semibold" htmlFor="isTaskDone">
+            <label className={`text-2xl font-semibold ${task.isTaskDone && "line-through"}`} htmlFor="isTaskDone">
               {task.taskName}
             </label>
           }
