@@ -1,51 +1,72 @@
-
+import { nanoid } from "nanoid";
 import { useState } from "react";
-import { AiFillDelete, AiFillPlusCircle } from "react-icons/ai";
+import { AiFillPlusCircle } from "react-icons/ai";
+import TaskList from "./components/ui/TaskList";
 const App = () => {
-  const [task, setTask] = useState({
-    taskName: "",
-    isTaskDone: false
-  });
-  const [buttonClicked, setButtonClicked]=useState(false)
-   
+  const [task, setTask] = useState("");
+  const [toDo, setAllToDo] = useState([]);
 
+  const handleOnChange = (event) => {
+    setTask(event.target.value);
+  };
+  const handleTasksubmit = (event) => {
+    if (task !== "") {
+      const newTask = { id: nanoid(), taskName: task, isTaskDone: false };
+      event.preventDefault();
 
-const handleTask = (event) =>{
-  const{name ,value,type, checked} =event.target
-setTask( prevTask => ({...prevTask , [name] : type==="checkbox" ? checked : value}))
-}
+      setAllToDo((prevToDoList) => [...prevToDoList, newTask]);
+      setTask("");
+    }
+  };
+
+  const handleTaskDone = (id) => {
+    console.log(id);
+    setAllToDo((prevToDoList) =>
+      prevToDoList.map((task) =>
+        task.id === id ? { ...task, isTaskDone: !task.isTaskDone } : task
+      )
+    );
+  };
+
+  const handleTaskDelete = (id) => {
+    setAllToDo((prevToDoList) => prevToDoList.filter((item) => item.id !== id));
+  };
+
   return (
     <div className="w-full max-w-7xl mx-auto mt-24 flex flex-col gap-y-8 justify-center items-center">
       <h1 className="text-8xl font-bold text-gray-400 opacity-20">todos</h1>
-      <div className=" flex justify-between  items-center py-3 px-4 w-[50%] rounded-full  border shadow-xl ">
+
+      <div className=" flex justify-between  items-center py-3 px-4 w-[50%] rounded-full border shadow-xl">
         <input
           type="text"
           name="taskName"
-          value={task.taskName}
-          onChange={handleTask}
+          value={task}
+          onChange={handleOnChange}
           placeholder=" Add todo..."
           className="text-xl font-semibold w-full outline-none px-4"
         />
         <AiFillPlusCircle
           size={25}
           className="text-green-800"
-          onClick={() => setButtonClicked(true)}
+          onClick={handleTasksubmit}
         />
       </div>
-
-      <div className="flex justify-between items-center w-[50%] border-b-2 border-gray-300 pb-2">
-        <div className="flex gap-x-3 items-center">
-          <input type="checkbox" checked={task.isTaskDone} name="isTaskDone" id="isTaskDone" onChange={handleTask} />
-          {buttonClicked &&
-            <label className={`text-2xl font-semibold ${task.isTaskDone && "line-through"}`} htmlFor="isTaskDone">
-              {task.taskName}
-            </label>
-          }
-        </div>
-        <div className="p-2 bg-gray-200 rounded-full">
-          <AiFillDelete size={16} className="text-red-500" />
-        </div>
-      </div>
+      {toDo.length > 0 ? (
+        toDo.map((oneTask) => (
+          <TaskList
+            key={oneTask.id}
+            taskName={oneTask.taskName}
+            checked={task.isTaskDone}
+            onChange={() => handleTaskDone(oneTask.id)}
+            deleteTask={() => handleTaskDelete(oneTask.id)}
+            styles={oneTask.isTaskDone}
+            index="isTaskDone"
+            name="isTaskDone"
+          />
+        ))
+      ) : (
+        <h2 className="text-4xl font-bold  text-gray-400 pt-12">noToDO</h2>
+      )}
     </div>
   );
 };
